@@ -177,8 +177,7 @@ def main():
             beam.update(screen)
         if bomb is not None:
             bomb.update(screen)
-        bomb.update(screen)
-        pg.display.update()
+        pg.display.update() 
         tmr += 1
         clock.tick(50)
 
