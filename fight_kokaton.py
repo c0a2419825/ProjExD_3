@@ -108,7 +108,7 @@ class Beam:
         if check_bound(self.rct) == (True, True):
             self.rct.move_ip(self.vx, self.vy)
             screen.blit(self.img, self.rct)    
-
+        return check_bound(self.rct) != (True,True)
 
 class Bomb:
     """
@@ -157,6 +157,7 @@ def main():
     bird = Bird((300, 200))
     beam=None
     score=None
+    beams=list()
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     clock = pg.time.Clock()
     tmr = 0
@@ -166,7 +167,8 @@ def main():
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)            
+                beam = Beam(bird)   
+                beams.append(beam)
         screen.blit(bg_img, [0, 0])
         
         for bomb in bombs:
@@ -180,26 +182,34 @@ def main():
         # if beam is not None:
             # if bomb is not None:  
 
-        for j, bomb in enumerate(bombs):
-            if beam is not None:
-                if beam.rct.colliderect(bomb.rct):
-                    beam = None
-                    bombs[j] = None
-                    bird.change_img(6,screen)
-            bombs = [bomb for bomb in bombs if bomb is not None]            
+            for j, bomb in enumerate(bombs):
+                for k,beam in enumerate(beams):     
+                    if beam is not None:          
+                        if beam.rct.colliderect(bomb.rct):
+                            beams[k] = None
+                            bombs[j] = None
+                            bird.change_img(6,screen)
+                bombs = [bomb for bomb in bombs if bomb is not None] 
+                beams = [beam for beam in beams if beam is not None] 
+                           
             
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)       
-        if beam is not None:
-            beam.update(screen)
+        # if beam is not None:
+        #     beam.update(screen)
+        for i,beam in enumerate(beams):
+            if beam is not None:          
+                if beam.update(screen):
+                    beams[i]=None
+                     
         for bomb in bombs:
             bomb.update(screen)
-            score = Score(str(5-len(bombs)),(0, 0, 255))
-            score.update(screen)
+        score = Score(str(NUM_OF_BOMBS-len(bombs)),(0, 0, 255))
+        score.update(screen)
+        
         pg.display.update() 
         tmr += 1
         clock.tick(50)
-
 
 if __name__ == "__main__":
     pg.init()
