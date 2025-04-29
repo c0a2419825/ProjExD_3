@@ -140,6 +140,15 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
+class Score:
+    def __init__(self, num: str, color: tuple[int, int, int]):
+        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.img = self.fonto.render("Score"+num, True, color)
+        
+    def update(self, screen: pg.Surface):
+        screen.blit(self.img, [100, HEIGHT-50])
+        
+
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
@@ -147,6 +156,7 @@ def main():
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     beam=None
+    score=None
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     clock = pg.time.Clock()
     tmr = 0
@@ -184,6 +194,8 @@ def main():
             beam.update(screen)
         for bomb in bombs:
             bomb.update(screen)
+            score = Score(str(5-len(bombs)),(0, 0, 255))
+            score.update(screen)
         pg.display.update() 
         tmr += 1
         clock.tick(50)
